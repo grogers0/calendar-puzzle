@@ -1,14 +1,15 @@
 use std::fmt;
+use std::collections::HashSet;
 
-#[derive(Hash, PartialEq, Eq, Debug)]
-struct Piece {
+#[derive(Clone, Hash, PartialEq, Eq, Debug)]
+pub struct Piece {
     width: usize,
     height: usize,
     grid: Vec<bool>,
 }
 
 impl Piece {
-    fn parse(s: &str) -> Piece {
+    pub fn parse(s: &str) -> Piece {
         let height = s.lines().count();
         let width = s.lines().next().unwrap().chars().count();
         let mut grid = vec![false; width * height];
@@ -27,7 +28,7 @@ impl Piece {
     }
 
     // Flip horizontally
-    fn flipped(&self) -> Piece {
+    pub fn flipped(&self) -> Piece {
         let width = self.width;
         let height = self.height;
         let mut grid = vec![false; width * height];
@@ -41,7 +42,7 @@ impl Piece {
     }
 
     // Rotate 90 degrees clockwise
-    fn rotated(&self) -> Piece {
+    pub fn rotated(&self) -> Piece {
         let width = self.height;
         let height = self.width;
         let mut grid = vec![false; width * height];
@@ -52,6 +53,27 @@ impl Piece {
             }
         }
         Piece { width, height, grid }
+    }
+
+    pub fn permutations(&self) -> HashSet<Piece> {
+        let mut ret = HashSet::<Piece>::new();
+        let mut p = self.clone();
+        ret.insert(p.clone());
+        p = p.rotated();
+        ret.insert(p.clone());
+        p = p.rotated();
+        ret.insert(p.clone());
+        p = p.rotated();
+        ret.insert(p.clone());
+        p = self.flipped();
+        ret.insert(p.clone());
+        p = p.rotated();
+        ret.insert(p.clone());
+        p = p.rotated();
+        ret.insert(p.clone());
+        p = p.rotated();
+        ret.insert(p.clone());
+        ret
     }
 }
 
