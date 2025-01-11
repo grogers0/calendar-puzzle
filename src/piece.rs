@@ -14,6 +14,7 @@ impl Piece {
         let width = s.lines().next().unwrap().chars().count();
         let mut grid = vec![false; width * height];
         for (y, line) in s.lines().enumerate() {
+            assert_eq!(line.chars().count(), width, "must be rectangular");
             for (x, ch) in line.chars().enumerate() {
                 match ch {
                     '#' => {
