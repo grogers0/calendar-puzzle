@@ -1,13 +1,12 @@
 mod board;
 mod input;
 mod piece;
+mod pos;
+
+use pos::Pos;
 
 fn main() {
-    println!("{}\n", *input::BOARD);
-    for p in input::PIECES.iter() {
-        for p2 in p.permutations() {
-            println!("{}\n--------", p2);
-        }
-        println!("====================");
-    }
+    let mut b = input::BOARD.clone();
+    b.place(&input::PIECES[2], &Pos::new(0, 0));
+    println!("{}\n", b);
 }

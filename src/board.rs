@@ -1,11 +1,20 @@
 use std::fmt;
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+use crate::piece::Piece;
+use crate::pos::Pos;
+
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum Cell {
     Empty,
     Wall,
     Piece,
     Goal,
+}
+
+impl Cell {
+    fn is_empty(&self) -> bool {
+        *self == Cell::Empty
+    }
 }
 
 
@@ -38,10 +47,51 @@ impl Board {
     }
 
     pub fn is_filled(&self) -> bool {
-        for space in &self.grid {
-            if let Cell::Empty = space { return false; }
+        for cell in &self.grid {
+            if cell.is_empty() { return false; }
         }
         true
+    }
+
+    pub fn can_place(&self, piece: &Piece, pos: &Pos) -> bool {
+        if pos.x + piece.width > self.width { return false; }
+        if pos.y + piece.height > self.height { return false; }
+        for y in 0..piece.height {
+            for x in 0..piece.width {
+                if piece.grid[y * piece.width + x] {
+                    let idx = (y + pos.y) * self.width + (x + pos.x);
+                    if !self.grid[idx].is_empty() {
+                        return false;
+                    }
+                }
+            }
+        }
+        true
+    }
+
+    pub fn place(&mut self, piece: &Piece, pos: &Pos) {
+        debug_assert!(self.can_place(piece, pos));
+        for y in 0..piece.height {
+            for x in 0..piece.width {
+                if piece.grid[y * piece.width + x] {
+                    let idx = (y + pos.y) * self.width + (x + pos.x);
+                    self.grid[idx] = Cell::Piece;
+                }
+            }
+        }
+    }
+
+    // Caller must ensure the piece was meant to be placed there
+    pub fn unplace(&mut self, piece: &Piece, pos: &Pos) {
+        for y in 0..piece.height {
+            for x in 0..piece.width {
+                if piece.grid[y * piece.width + x] {
+                    let idx = (y + pos.y) * self.width + (x + pos.x);
+                    debug_assert_eq!(self.grid[idx], Cell::Piece);
+                    self.grid[idx] = Cell::Empty;
+                }
+            }
+        }
     }
 }
 
@@ -56,7 +106,7 @@ impl fmt::Display for Board {
                     Cell::Piece => '.',
                     Cell::Goal => '*',
                 };
-                write!(f, "{}", ch);
+                write!(f, "{}", ch)?;
             }
         }
         Ok(())

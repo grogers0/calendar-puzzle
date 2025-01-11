@@ -3,9 +3,9 @@ use std::collections::HashSet;
 
 #[derive(Clone, Hash, PartialEq, Eq, Debug)]
 pub struct Piece {
-    width: usize,
-    height: usize,
-    grid: Vec<bool>,
+    pub width: usize,
+    pub height: usize,
+    pub grid: Vec<bool>,
 }
 
 impl Piece {
